@@ -1,45 +1,32 @@
-from .variant import Variant  # 같은 패키지 내 variant 모듈에서 가져옴
+import pysam
+from .variant import Variant
 
-def check_SBC(line):
-	if line != variant.twin2_GT:
-		return True
-	return False
+def parse_vcf(vcf_file, sample1_id, sample2_id):
+    """VCF 파일에서 쌍둥이 간 SBC를 추출."""
+    vcf_in = pysam.VariantFile(vcf_file)
+    variants = []
 
+    for record in vcf_in:
+        sample1 = record.samples[sample1_id]
+        sample2 = record.samples[sample2_id]
+        gt1, gt2 = sample1['GT'], sample2['GT']
 
+        # 쌍둥이 간 GT가 다르면 SBC로 간주
+        if gt1 != gt2:
+            variant = Variant(
+                chrom=record.chrom,
+                position=record.pos,
+                ref=record.ref,
+                alt=record.alts[0],  # 단일 alt 가정
+                sample1_gt=gt1,
+                sample2_gt=gt2,
+                sample1_dp=sample1.get('DP', 0),
+                sample2_dp=sample2.get('DP', 0),
+                sample1_gq=sample1.get('GQ', 0),
+                sample2_gq=sample2.get('GQ', 0),
+                sample1_ab=sample1.get('AB', [0])[0] if 'AB' in sample1 else None,
+                sample2_ab=sample2.get('AB', [0])[0] if 'AB' in sample2 else None
+            )
+            variants.append(variant)
 
-
-
-
-
-def parse_vcf(vcf_path):
-    """
-    VCF 파일을 파싱해서 Variant 객체 리스트를 반환.
-    """
-
-    vcf = open(vcf_path, 'r')
-
-
-	for line in vcf_path
-
-
-
-
-
-
-
-
-
-
-
-    # 예시로 더미 데이터 반환
-    variants = [
-        Variant(chrom="chr1", position=100, ref="A", alt="T"),
-        Variant(chrom="chr1", position=200, ref="G", alt="C")
-    ]
     return variants
-
-
-
-
-
-

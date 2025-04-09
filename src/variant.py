@@ -1,35 +1,40 @@
 class Variant:
-    def __init__(self, chrom: str, pos: int, ref: str, alt: str, twin1_GT: list, twin2_GT: list, 
-                    twin1_AD: list, twin2_AD: list, twin1_MAF: float, twin2_MAF: float ):
-        """Variant 객체 초기화."""
+    def __init__(self, chrom, position, ref, alt, sample1_gt, sample2_gt, 
+                 sample1_dp, sample2_dp, sample1_gq, sample2_gq, sample1_ab, sample2_ab):
         self.chrom = chrom
-        self.pos = pos
+        self.position = position
         self.ref = ref
         self.alt = alt
-        self.is_valid = None  # 검증 결과 저장용
-        self.twin1_GT = twin1_GT
-        self.twin2_GT = twin2_GT
-        self.twin1_AD = twin1_AD
-        self.twin2_AD = twin2_AD
-        self.twin1_MAF = twin1_MAF
-        self.twin2_MAF = twin2_MAF
+        self.sample1_gt = sample1_gt
+        self.sample2_gt = sample2_gt
+        self.sample1_dp = sample1_dp
+        self.sample2_dp = sample2_dp
+        self.sample1_gq = sample1_gq
+        self.sample2_gq = sample2_gq
+        self.sample1_ab = sample1_ab
+        self.sample2_ab = sample2_ab
+        self.quality_category = self.classify_quality()
 
-    def validate_variant(self):
-        """이 변이가 SAM 파일과 일치하는지 검증하는 메서드."""
-        # 실제로는 SAM 데이터와 비교 로직이 들어감
-        # 지금은 더미로 True 반환
-        self.is_valid = True
-        return self.is_valid
-
-    @classmethod
-    def from_dict(cls, variant_dict):
-        """딕셔너리에서 Variant 객체를 생성하는 클래스 메서드 예시."""
-        return cls(
-            chrom=variant_dict["chrom"],
-            position=variant_dict["pos"],
-            ref=variant_dict["ref"],
-            alt=variant_dict["alt"]
-        )
+    def classify_quality(self):
+        """논문 기준으로 SBC를 High-quality, Low-quality, Incorrect로 분류."""
+        # High-quality: DP ≥ 20, GQ ≥ 30, AB ≥ 0.2 (SAM 기준은 생략)
+        if (self.sample1_dp >= 20 and self.sample2_dp >= 20 and
+            self.sample1_gq >= 30 and self.sample2_gq >= 30 and
+            (self.sample1_ab is not None and self.sample1_ab >= 0.2 or
+             self.sample2_ab is not None and self.sample2_ab >= 0.2)):
+            return "high_quality"
+        
+        # Low-quality: DP ≥ 10, GQ ≥ 20, AB ≥ 0.1
+        elif (self.sample1_dp >= 10 and self.sample2_dp >= 10 and
+              self.sample1_gq >= 20 and self.sample2_gq >= 20 and
+              (self.sample1_ab is not None and self.sample1_ab >= 0.1 or
+               self.sample2_ab is not None and self.sample2_ab >= 0.1)):
+            return "low_quality"
+        
+        # Clear incorrect
+        return "incorrect"
 
     def __str__(self):
-        return f"{self.chrom}:{self.position} {self.ref}>{self.alt}"
+        return (f"{self.chrom}:{self.position} {self.ref}>{self.alt} "
+                f"GT1={self.sample1_gt} GT2={self.sample2_gt} "
+                f"Quality={self.quality_category}")
