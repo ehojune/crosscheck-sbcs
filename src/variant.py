@@ -1,11 +1,18 @@
 class Variant:
-    def __init__(self, chrom, position, ref, alt):
+    def __init__(self, chrom: str, pos: int, ref: str, alt: str, twin1_GT: list, twin2_GT: list, 
+                    twin1_AD: list, twin2_AD: list, twin1_MAF: float, twin2_MAF: float ):
         """Variant 객체 초기화."""
         self.chrom = chrom
-        self.position = position
+        self.pos = pos
         self.ref = ref
         self.alt = alt
         self.is_valid = None  # 검증 결과 저장용
+        self.twin1_GT = twin1_GT
+        self.twin2_GT = twin2_GT
+        self.twin1_AD = twin1_AD
+        self.twin2_AD = twin2_AD
+        self.twin1_MAF = twin1_MAF
+        self.twin2_MAF = twin2_MAF
 
     def validate_variant(self):
         """이 변이가 SAM 파일과 일치하는지 검증하는 메서드."""
