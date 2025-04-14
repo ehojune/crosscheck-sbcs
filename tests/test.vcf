@@ -8,6 +8,7 @@
 ##FORMAT=<ID=RNC,Number=1,Type=String,Description="Reason for no call">
 ##INFO=<ID=AF,Number=A,Type=Float,Description="Allele Frequency">
 ##INFO=<ID=AQ,Number=1,Type=Integer,Description="Allele Quality">
+##contig=<ID=chr1,length=248956422>
 #CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	KOREA1K-143	KOREA1K-265
 chr1	1	testdummy_nshq1	G	C	50	.	AF=1;AQ=17	GT:DP:AD:GQ:PL:RNC	0/0:100:100,0:999:77,77,77:.	0/0:100:100,0:999:77,77,77:.
 chr1	2	testdummy_nshq2	G	C	50	.	AF=1;AQ=17	GT:DP:AD:GQ:PL:RNC	0/1:100:50,50:999:77,77,77:.	0/1:100:50,50:999:77,77,77:.
@@ -21,10 +22,11 @@ chr1	9	testdummy_nsic1	G	C	50	.	AF=1;AQ=17	GT:DP:AD:GQ:PL:RNC	0/0:6:6,0:6:77,77,
 chr1	10	testdummy_nsic2	G	C	50	.	AF=1;AQ=17	GT:DP:AD:GQ:PL:RNC	0/1:6:3,3:6:77,77,77:.	0/1:6:3,3:6:77,77,77:.
 chr1	11	testdummy_nsic3	G	C	50	.	AF=1;AQ=17	GT:DP:AD:GQ:PL:RNC	1/1:6:0,6:6:77,77,77:.	1/1:6:0,6:6:77,77,77:.
 chr1	12	testdummy_nsic4	G	C,T	50	.	AF=1;AQ=17	GT:DP:AD:GQ:PL:RNC	1/2:6:0,3,3:6:77,77,77:.	1/2:6:0,3,3:6:77,77,77:.
+chr1	12	testdummy_nsic4	G	C,T	50	.	AF=1;AQ=17	GT:DP:AD:GQ:PL:RNC	./.:6:0,3,3:6:77,77,77:.	./.:6:0,3,3:6:77,77,77:.
 chr1	101	testdummy_shq1	G	C	50	.	AF=1;AQ=17	GT:DP:AD:GQ:PL:RNC	0/0:100:100,0:999:77,77,77:.	0/1:100:50,50:999:77,77,77:.	
 chr1	102	testdummy_shq2	G	C	50	.	AF=1;AQ=17	GT:DP:AD:GQ:PL:RNC	0/1:100:50,50:999:77,77,77:.	1/1:100:0,100:999:77,77,77:.	
 chr1	103	testdummy_shq3	G	C	50	.	AF=1;AQ=17	GT:DP:AD:GQ:PL:RNC	0/0:100:100,0:999:77,77,77:.	1/1:100:0,100:999:77,77,77:.	
-chr1	104	testdummy_shq4	G	C	50	.	AF=1;AQ=17	GT:DP:AD:GQ:PL:RNC	0/0:100:100,0:999:77,77,77:.	1/2:100:50,50:999:77,77,77:.	
+chr1	104	testdummy_shq4	G	C,T	50	.	AF=1;AQ=17	GT:DP:AD:GQ:PL:RNC	0/0:100:100,0:999:77,77,77:.	1/2:100:50,50:999:77,77,77:.	
 chr1	105	testdummy_shq5	G	C,T	50	.	AF=1;AQ=17	GT:DP:AD:GQ:PL:RNC	0/1:100:50,50:999:77,77,77:.	1/2:100:0,50,50:999:77,77,77:.	
 chr1	106	testdummy_shq6	G	C,T	50	.	AF=1;AQ=17	GT:DP:AD:GQ:PL:RNC	0/2:100:0,100,0:999:77,77,77:.	1/2:100:0,50,50:999:77,77,77:.	
 chr1	107	testdummy_shq7	G	C,T	50	.	AF=1;AQ=17	GT:DP:AD:GQ:PL:RNC	0/1:100:50,50:999:77,77,77:.	0/2:100:0,100,0:999:77,77,77:.	
@@ -33,7 +35,7 @@ chr1	109	testdummy_shq9	G	C	50	.	AF=1;AQ=17	GT:DP:AD:GQ:PL:RNC	1/1:100:0,100:999
 chr1	201	testdummy_slq1	G	C	50	.	AF=1;AQ=17	GT:DP:AD:GQ:PL:RNC	0/0:14:14,0:20:77,77,77:.	0/1:14:7,7:20:77,77,77:.	
 chr1	202	testdummy_slq2	G	C	50	.	AF=1;AQ=17	GT:DP:AD:GQ:PL:RNC	0/1:14:7,7:20:77,77,77:.	1/1:14:0,14:20:77,77,77:.	
 chr1	203	testdummy_slq3	G	C	50	.	AF=1;AQ=17	GT:DP:AD:GQ:PL:RNC	0/0:14:14,0:20:77,77,77:.	1/1:14:0,14:20:77,77,77:.	
-chr1	204	testdummy_slq4	G	C	50	.	AF=1;AQ=17	GT:DP:AD:GQ:PL:RNC	0/0:14:14,0:20:77,77,77:.	1/2:14:7,7:20:77,77,77:.	
+chr1	204	testdummy_slq4	G	C,T	50	.	AF=1;AQ=17	GT:DP:AD:GQ:PL:RNC	0/0:14:14,0:20:77,77,77:.	1/2:14:7,7:20:77,77,77:.	
 chr1	205	testdummy_slq5	G	C,T	50	.	AF=1;AQ=17	GT:DP:AD:GQ:PL:RNC	0/1:14:7,7:20:77,77,77:.	1/2:14:0,7,7:20:77,77,77:.	
 chr1	206	testdummy_slq6	G	C,T	50	.	AF=1;AQ=17	GT:DP:AD:GQ:PL:RNC	0/2:14:0,14,0:20:77,77,77:.	1/2:14:0,7,7:20:77,77,77:.	
 chr1	207	testdummy_slq7	G	C,T	50	.	AF=1;AQ=17	GT:DP:AD:GQ:PL:RNC	0/1:14:7,7:20:77,77,77:.	0/2:14:0,14,0:20:77,77,77:.	
@@ -42,7 +44,7 @@ chr1	209	testdummy_slq9	G	C	50	.	AF=1;AQ=17	GT:DP:AD:GQ:PL:RNC	1/1:14:0,14:20:77
 chr1	301	testdummy_sic1	G	C	50	.	AF=1;AQ=17	GT:DP:AD:GQ:PL:RNC	0/0:6:6,0:6:77,77,77:.	0/1:6:3,3:6:77,77,77:.	
 chr1	302	testdummy_sic2	G	C	50	.	AF=1;AQ=17	GT:DP:AD:GQ:PL:RNC	0/1:6:3,3:6:77,77,77:.	1/1:6:0,6:6:77,77,77:.	
 chr1	303	testdummy_sic3	G	C	50	.	AF=1;AQ=17	GT:DP:AD:GQ:PL:RNC	0/0:6:6,0:6:77,77,77:.	1/1:6:0,6:6:77,77,77:.	
-chr1	304	testdummy_sic4	G	C	50	.	AF=1;AQ=17	GT:DP:AD:GQ:PL:RNC	0/0:6:6,0:6:77,77,77:.	1/2:6:3,3:6:77,77,77:.	
+chr1	304	testdummy_sic4	G	C,T	50	.	AF=1;AQ=17	GT:DP:AD:GQ:PL:RNC	0/0:6:6,0:6:77,77,77:.	1/2:6:3,3:6:77,77,77:.	
 chr1	305	testdummy_sic5	G	C,T	50	.	AF=1;AQ=17	GT:DP:AD:GQ:PL:RNC	0/1:6:3,3:6:77,77,77:.	1/2:6:0,3,3:6:77,77,77:.	
 chr1	306	testdummy_sic6	G	C,T	50	.	AF=1;AQ=17	GT:DP:AD:GQ:PL:RNC	0/2:6:0,6,0:6:77,77,77:.	1/2:6:0,3,3:6:77,77,77:.	
 chr1	307	testdummy_sic7	G	C,T	50	.	AF=1;AQ=17	GT:DP:AD:GQ:PL:RNC	0/1:6:3,3:6:77,77,77:.	0/2:6:0,6,0:6:77,77,77:.	
