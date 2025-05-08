@@ -1,0 +1,1 @@
+chr1:101 G>C GT1=(0, 0) GT2=(0, 1) Quality=high_quality Sample1_Reads=5 Sample2_Reads=5
