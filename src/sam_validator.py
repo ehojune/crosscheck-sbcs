@@ -1,35 +1,26 @@
 import pysam
 from .variant import Variant
 
-def validate_sam(variants, bam_path):
-    """
-    BAM 파일에서 Variant 위치에 해당하는 alignment를 확인해 검증.
-    variants: Variant 객체 리스트
-    bam_path: BAM 파일 경로 (인덱스된 .bai 파일이 있어야 함)
-    """
-    # BAM 파일 열기 (인덱스가 필요하므로 .bai 파일이 있어야 함)
-    bam_file = pysam.AlignmentFile(bam_path, "rb")
+def validate_sam(variants, bam1_path, bam2_path, sample1_id, sample2_id):
+    """샘플별 BAM 파일에서 변이 검증."""
+    try:
+        bam1_file = pysam.AlignmentFile(bam1_path, "rb")
+        bam2_file = pysam.AlignmentFile(bam2_path, "rb")
+    except Exception as e:
+        print(f"Error opening BAM files: {e}")
+        return []
 
-    validated_variants = []
     for variant in variants:
-        # 특정 위치의 읽기 가져오기
-        reads = bam_file.fetch(variant.chrom, variant.position - 1, variant.position)
-        # 참고: fetch는 0-based 좌표를 사용하므로 position - 1
+        # 샘플1 검증
+        expected_base1 = variant.ref if variant.sample1_gt == (0, 0) else variant.alt
+        reads1 = bam1_file.fetch(variant.chrom, variant.position - 1, variant.position)
+        variant.validate_with_sam(sample1_id, reads1, expected_base1)
 
-        # 읽기에서 변이 확인 (간단한 예시로 ref/alt 비교)
-        is_valid = False
-        for read in reads:
-            if read.reference_start <= variant.position - 1 <= read.reference_end:
-                # 해당 위치의 base 확인 (read.query_sequence 사용)
-                pos_in_read = variant.position - 1 - read.reference_start
-                if pos_in_read < len(read.query_sequence):
-                    base = read.query_sequence[pos_in_read]
-                    if base == variant.alt:
-                        is_valid = True
-                        break  # 일치하면 더 볼 필요 없음
+        # 샘플2 검증
+        expected_base2 = variant.ref if variant.sample2_gt == (0, 0) else variant.alt
+        reads2 = bam2_file.fetch(variant.chrom, variant.position - 1, variant.position)
+        variant.validate_with_sam(sample2_id, reads2, expected_base2)
 
-        variant.is_valid = is_valid
-        validated_variants.append(variant)
-
-    bam_file.close()
-    return validated_variants
+    bam1_file.close()
+    bam2_file.close()
+    return variants
