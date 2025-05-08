@@ -1,4 +1,4 @@
-import pysam
+import pysam # type: ignore
 from .variant import Variant
 
 def parse_vcf(vcf_file, sample1_id, sample2_id):
@@ -11,12 +11,12 @@ def parse_vcf(vcf_file, sample1_id, sample2_id):
         sample2 = record.samples[sample2_id]
         gt1, gt2 = sample1['GT'], sample2['GT']
 
-        if gt1 != gt2:
+        if gt1 != gt2 and None not in gt1 and None not in gt2:  # ./.: 제외
             variant = Variant(
                 chrom=record.chrom,
                 position=record.pos,
                 ref=record.ref,
-                alt=record.alts[0],
+                alt=tuple(record.alts) if len(record.alts) > 1 else record.alts[0],
                 sample1_gt=gt1,
                 sample2_gt=gt2,
                 sample1_dp=sample1.get('DP', 0),

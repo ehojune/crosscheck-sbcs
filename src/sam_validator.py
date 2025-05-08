@@ -1,4 +1,4 @@
-import pysam
+import pysam  # type: ignore
 from .variant import Variant
 
 def validate_sam(variants, bam1_path, bam2_path, sample1_id, sample2_id):
@@ -12,14 +12,12 @@ def validate_sam(variants, bam1_path, bam2_path, sample1_id, sample2_id):
 
     for variant in variants:
         # 샘플1 검증
-        expected_base1 = variant.ref if variant.sample1_gt == (0, 0) else variant.alt
         reads1 = bam1_file.fetch(variant.chrom, variant.position - 1, variant.position)
-        variant.validate_with_sam(sample1_id, reads1, expected_base1, sample1_id, sample2_id)
+        variant.validate_with_sam(sample1_id, reads1, sample1_id, sample2_id)
 
         # 샘플2 검증
-        expected_base2 = variant.ref if variant.sample2_gt == (0, 0) else variant.alt
         reads2 = bam2_file.fetch(variant.chrom, variant.position - 1, variant.position)
-        variant.validate_with_sam(sample2_id, reads2, expected_base2, sample1_id, sample2_id)
+        variant.validate_with_sam(sample2_id, reads2, sample1_id, sample2_id)
 
     bam1_file.close()
     bam2_file.close()

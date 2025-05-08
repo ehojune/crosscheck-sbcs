@@ -5,7 +5,7 @@ from src.plotting import plot_chromosome_counts
 
 # 설정 파일 읽기
 config = configparser.ConfigParser()
-config.read('config/config.ini')
+config.read('config/config2.ini')
 vcf_path = config['paths']['vcf']
 bam1_path = config['paths']['bam1']
 bam2_path = config['paths']['bam2']
