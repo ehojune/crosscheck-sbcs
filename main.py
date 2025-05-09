@@ -4,7 +4,7 @@ import csv
 import argparse
 from src.vcf_parser import parse_vcf
 from src.sam_validator import validate_sam
-from src.plotting import plot_pre_sam_histogram, plot_post_sam_histogram
+from src.plotting import plot_pre_sam_histogram, plot_post_sam_histogram, plot_hq_histogram
 
 def main():
     # argparse로 인자 처리
@@ -68,6 +68,10 @@ def main():
     # SAM 검증 후 히스토그램
     print("\nPlotting post-SAM validation histogram...")
     plot_post_sam_histogram(variants, output_dir)
+    
+    # High-quality만의 히스토그램
+    print("\nPlotting High-quality histogram...")
+    plot_hq_histogram(variants, output_dir)
     
     # CSV 파일 생성
     print("\nGenerating CSV file...")
