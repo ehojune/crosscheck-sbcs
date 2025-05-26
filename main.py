@@ -2,6 +2,7 @@ import configparser
 import os
 import csv
 import argparse
+import pysam
 from src.vcf_parser import parse_vcf
 from src.sam_validator import validate_sam
 from src.plotting import plot_pre_sam_histogram, plot_post_sam_histogram, plot_hq_histogram
@@ -24,6 +25,7 @@ def main():
     vcf_path = config['paths']['vcf']
     bam1_path = config['paths']['bam1']
     bam2_path = config['paths']['bam2']
+    reference_fasta = config['paths'].get('reference_fasta', 'hg38.fa')  # 추가: 참조 서열 파일 경로
     sample1_id = config['samples']['sample1']
     sample2_id = config['samples']['sample2']
     
@@ -82,6 +84,18 @@ def main():
         for variant in variants:
             writer.writerow([variant.chrom, variant.position, variant.ref, variant.alt, str(variant.sample1_gt), str(variant.sample2_gt), variant.sample1_dp, variant.sample2_dp, variant.sample1_gq, variant.sample2_gq, ':'.join(map(str, variant.sample1_ad)), ':'.join(map(str, variant.sample2_ad)), str(variant.sample1_ab), str(variant.sample2_ab), str(variant.sample1_base_counts), str(variant.sample2_base_counts), str(variant.sample1_alt_ratio), str(variant.sample2_alt_ratio), variant.quality_category])
     print(f"CSV file '{csv_path}' generated in output directory.")
+
+    # SAM 검증 후 High-quality 스냅샷 생성
+    for variant in variants:
+        if variant.quality_category == "high_quality":
+            bam1_file = pysam.AlignmentFile(bam1_path, "rb")
+            bam2_file = pysam.AlignmentFile(bam2_path, "rb")
+            reads1 = bam1_file.fetch(variant.chrom, max(1, variant.position - 21), variant.position + 20)
+            reads2 = bam2_file.fetch(variant.chrom, max(1, variant.position - 21), variant.position + 20)
+            variant.validate_with_sam(sample1_id, reads1, sample1_id, sample2_id, output_dir, reference_fasta)
+            variant.validate_with_sam(sample2_id, reads2, sample1_id, sample2_id, output_dir, reference_fasta)
+            bam1_file.close()
+            bam2_file.close()
 
 if __name__ == "__main__":
     main()

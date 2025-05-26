@@ -1,4 +1,6 @@
 from collections import Counter
+import os
+from igv_reports.report import create_report
 
 class Variant:
     def __init__(self, chrom, position, ref, alt, sample1_gt, sample2_gt, 
@@ -95,8 +97,8 @@ class Variant:
         print(f"{self.chrom}:{self.position} classified as low_quality")
         return "low_quality"
 
-    def validate_with_sam(self, sample_id, reads, sample1_id, sample2_id):
-        """샘플별 SAM 읽기로 변이 검증 (base 분포 분석)."""
+    def validate_with_sam(self, sample_id, reads, sample1_id, sample2_id, output_dir=None, reference_fasta=None):
+        """샘플별 SAM 읽기로 변이 검증 및 IGV 스냅샷 생성."""
         base_counts = Counter()
         read_count = 0
         for read in reads:
@@ -114,9 +116,8 @@ class Variant:
                     print(f"Read out of range at {self.chrom}:{self.position} for {sample_id}: {read.reference_start}-{read.reference_end}")
             else:
                 print(f"Skipped low MAPQ read at {self.chrom}:{self.position} for {sample_id}: MAPQ={read.mapping_quality}")
-            read_count += 1  # 총 reads 수
+            read_count += 1
 
-        # Major/minor read 계산
         sorted_bases = base_counts.most_common()
         total_bases = sum(base_counts.values())
         major_count = sorted_bases[0][1] if sorted_bases else 0
@@ -124,7 +125,6 @@ class Variant:
         major_ratio = major_count / total_bases if total_bases > 0 else 0.0
         minor_ratio = minor_count / total_bases if total_bases > 0 else 0.0
 
-        # ALT 비율 계산
         alt_count = base_counts.get(self.alt, 0)
         alt2_count = base_counts.get(self.alt2, 0) if self.alt2 else 0
         alt_ratio = (alt_count + alt2_count) / total_bases if total_bases > 0 else 0.0
@@ -148,9 +148,27 @@ class Variant:
             self.sample2_base_counts = dict(base_counts)
             self.sample2_alt_ratio = alt_ratio
 
+        if output_dir and self.quality_category == "high_quality" and reference_fasta:
+            self.generate_igv_snapshot(sample_id, bam_path, output_dir, sample1_id, sample2_id, reference_fasta)
+
         print(f"Validated {self.chrom}:{self.position} for {sample_id} - Bases: {base_counts}, "
             f"Major: {major_count} ({major_ratio:.2f}), Minor: {minor_count} ({minor_ratio:.2f}), "
             f"ALT_ratio: {alt_ratio}, Total_reads: {read_count}")
+        
+    def generate_igv_snapshot(self, sample_id, bam_path, output_dir, sample1_id, sample2_id, reference_fasta):
+        """PyIGV를 사용해 IGV 스타일 스냅샷 생성."""
+        region = f"{self.chrom}:{max(1, self.position - 20)}-{self.position + 20}"
+        output_html = os.path.join(output_dir, f"{self.chrom}_{self.position}_{self.ref}>{self.alt}.html")
+        tracks = [bam_path] if sample_id == sample1_id else [bam_path.replace(sample1_id, sample2_id)]
+        
+        create_report(
+            sites=[{"chrom": self.chrom, "start": max(1, self.position - 20), "end": self.position + 20}],
+            fasta=reference_fasta,
+            tracks=tracks,
+            flanking=20,
+            output=output_html
+        )
+        print(f"IGV snapshot generated for {sample_id} at {output_html}")
 
     def __str__(self):
         return (f"{self.chrom}:{self.position} {self.ref}>{self.alt} "
