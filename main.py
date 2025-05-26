@@ -39,14 +39,14 @@ def main():
     print(f"Total SBCs: {len(variants)}")
     
     # SAM 검증 전 분류
-    quality_counts_pre = {'high_quality': 0, 'low_quality': 0, 'incorrect': 0}
+    quality_counts_pre = {'high_quality': 0, 'moderate_quality': 0, 'low_quality': 0}
     for variant in variants:
         quality_counts_pre[variant.quality_category] += 1
     print("\n=== Before SAM Validation ===")
     print(f"Total SBCs: {len(variants)}")
     print(f"High-quality SBCs: {quality_counts_pre['high_quality']}")
+    print(f"Moderate-quality SBCs: {quality_counts_pre['moderate_quality']}")
     print(f"Low-quality SBCs: {quality_counts_pre['low_quality']}")
-    print(f"Incorrect SBCs: {quality_counts_pre['incorrect']}")
     
     # SAM 검증 전 히스토그램
     print("\nPlotting pre-SAM validation histogram...")
@@ -57,15 +57,15 @@ def main():
     variants = validate_sam(variants, bam1_path, bam2_path, sample1_id, sample2_id)
     
     # SAM 검증 후 분류
-    quality_counts_post = {'high_quality': 0, 'low_quality': 0, 'incorrect': 0}
+    quality_counts_post = {'high_quality': 0, 'moderate_quality': 0, 'low_quality': 0}
     for variant in variants:
         variant.quality_category = variant.classify_quality(use_sam=True)
         quality_counts_post[variant.quality_category] += 1
     print("\n=== After SAM Validation ===")
     print(f"Total SBCs: {len(variants)}")
     print(f"High-quality SBCs: {quality_counts_post['high_quality']}")
+    print(f"Moderate-quality SBCs: {quality_counts_post['moderate_quality']}")
     print(f"Low-quality SBCs: {quality_counts_post['low_quality']}")
-    print(f"Incorrect SBCs: {quality_counts_post['incorrect']}")
     
     # SAM 검증 후 히스토그램
     print("\nPlotting post-SAM validation histogram...")

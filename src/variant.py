@@ -28,6 +28,14 @@ class Variant:
         self.sample2_base_counts = {}
         self.sample1_alt_ratio = 0.0
         self.sample2_alt_ratio = 0.0
+        self.sample1_major_count = 0
+        self.sample1_minor_count = 0
+        self.sample1_major_ratio = 0.0
+        self.sample1_minor_ratio = 0.0
+        self.sample2_major_count = 0
+        self.sample2_minor_count = 0
+        self.sample2_major_ratio = 0.0
+        self.sample2_minor_ratio = 0.0
         self.quality_category = self.classify_quality(use_sam=False)
         print(f"Initialized {self.chrom}:{self.position} - AB1={self.sample1_ab}, AB2={self.sample2_ab}, GT1={self.sample1_gt}, GT2={self.sample2_gt}")
 
@@ -60,23 +68,24 @@ class Variant:
             (self.sample2_gt == (0, 0) and self.sample2_ab is not None and self.sample2_ab in [0, 1])  # hom
         )
 
-        # SAM 기반 조건
-        sam_condition_high = (
-            (self.sample1_gt != (0, 0) and self.sample1_alt_ratio >= 0.2 and self.sample1_major_count >= 5 and
-            self.sample2_alt_ratio >= 0.2 and self.sample2_major_count >= 5 and self.sample2_minor_count == 0) or  # het
-            (self.sample1_gt == (0, 0) and self.sample1_alt_ratio in [0, 1] and self.sample1_major_count >= 5 and
-            self.sample2_alt_ratio not in [0, 1] and self.sample2_major_count >= 5 and self.sample2_minor_count >= 1) or  # hom vs het
-            (self.sample1_gt == (0, 0) and self.sample1_alt_ratio in [0, 1] and self.sample1_major_count >= 5 and
-            self.sample2_alt_ratio in [0, 1] and self.sample2_major_count >= 5 and self.sample2_minor_count == 0)  # hom vs hom
-        )
-        sam_condition_moderate = (
-            (self.sample1_gt != (0, 0) and self.sample1_alt_ratio >= 0.1 and self.sample1_major_count >= 1 and
-            self.sample2_alt_ratio >= 0.1 and self.sample2_major_count >= 1) or  # het
-            (self.sample1_gt == (0, 0) and self.sample1_alt_ratio in [0, 1] and self.sample1_major_count >= 1 and
-            self.sample2_alt_ratio not in [0, 1] and self.sample2_major_count >= 1) or  # hom vs het
-            (self.sample1_gt == (0, 0) and self.sample1_alt_ratio in [0, 1] and self.sample1_major_count >= 1 and
-            self.sample2_alt_ratio in [0, 1] and self.sample2_major_count >= 1)  # hom vs hom
-        )
+        # SAM 기반 조건 (use_sam=True일 때만 적용)
+        if use_sam:
+            sam_condition_high = (
+                (self.sample1_gt != (0, 0) and self.sample1_alt_ratio >= 0.2 and self.sample1_major_count >= 5 and
+                 self.sample2_alt_ratio >= 0.2 and self.sample2_major_count >= 5 and self.sample2_minor_count == 0) or  # het
+                (self.sample1_gt == (0, 0) and self.sample1_alt_ratio in [0, 1] and self.sample1_major_count >= 5 and
+                 self.sample2_alt_ratio not in [0, 1] and self.sample2_major_count >= 5 and self.sample2_minor_count >= 1) or  # hom vs het
+                (self.sample1_gt == (0, 0) and self.sample1_alt_ratio in [0, 1] and self.sample1_major_count >= 5 and
+                 self.sample2_alt_ratio in [0, 1] and self.sample2_major_count >= 5 and self.sample2_minor_count == 0)  # hom vs hom
+            )
+            sam_condition_moderate = (
+                (self.sample1_gt != (0, 0) and self.sample1_alt_ratio >= 0.1 and self.sample1_major_count >= 1 and
+                 self.sample2_alt_ratio >= 0.1 and self.sample2_major_count >= 1) or  # het
+                (self.sample1_gt == (0, 0) and self.sample1_alt_ratio in [0, 1] and self.sample1_major_count >= 1 and
+                 self.sample2_alt_ratio not in [0, 1] and self.sample2_major_count >= 1) or  # hom vs het
+                (self.sample1_gt == (0, 0) and self.sample1_alt_ratio in [0, 1] and self.sample1_major_count >= 1 and
+                 self.sample2_alt_ratio in [0, 1] and self.sample2_major_count >= 1)  # hom vs hom
+            )
 
         # High-quality
         if (self.sample1_dp and self.sample1_dp >= 20 and self.sample2_dp and self.sample2_dp >= 20 and
@@ -97,7 +106,7 @@ class Variant:
         print(f"{self.chrom}:{self.position} classified as low_quality")
         return "low_quality"
 
-    def validate_with_sam(self, sample_id, reads, sample1_id, sample2_id, output_dir=None, reference_fasta=None):
+    def validate_with_sam(self, sample_id, reads, sample1_id, sample2_id, output_dir=None, bam_path=None, reference_fasta=None):
         """샘플별 SAM 읽기로 변이 검증 및 IGV 스냅샷 생성."""
         base_counts = Counter()
         read_count = 0
@@ -152,9 +161,9 @@ class Variant:
             self.generate_igv_snapshot(sample_id, bam_path, output_dir, sample1_id, sample2_id, reference_fasta)
 
         print(f"Validated {self.chrom}:{self.position} for {sample_id} - Bases: {base_counts}, "
-            f"Major: {major_count} ({major_ratio:.2f}), Minor: {minor_count} ({minor_ratio:.2f}), "
-            f"ALT_ratio: {alt_ratio}, Total_reads: {read_count}")
-        
+              f"Major: {major_count} ({major_ratio:.2f}), Minor: {minor_count} ({minor_ratio:.2f}), "
+              f"ALT_ratio: {alt_ratio}, Total_reads: {read_count}")
+
     def generate_igv_snapshot(self, sample_id, bam_path, output_dir, sample1_id, sample2_id, reference_fasta):
         """PyIGV를 사용해 IGV 스타일 스냅샷 생성."""
         region = f"{self.chrom}:{max(1, self.position - 20)}-{self.position + 20}"

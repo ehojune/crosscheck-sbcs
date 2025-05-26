@@ -4,7 +4,7 @@ import os
 
 def plot_pre_sam_histogram(variants, output_dir):
     """SAM 검증 전 염색체별 SBC 분류 개수를 히스토그램으로 시각화."""
-    chr_counts = defaultdict(lambda: {'high_quality': 0, 'low_quality': 0, 'incorrect': 0, 'total': 0})
+    chr_counts = defaultdict(lambda: {'high_quality': 0, 'moderate_quality': 0, 'low_quality': 0, 'total': 0})
     for variant in variants:
         chr = variant.chrom
         quality = variant.quality_category
@@ -25,16 +25,16 @@ def plot_pre_sam_histogram(variants, output_dir):
     
     chromosomes = sorted(chr_counts.keys(), key=sort_key)
     hq_counts = [chr_counts[chr]['high_quality'] for chr in chromosomes]
+    mq_counts = [chr_counts[chr]['moderate_quality'] for chr in chromosomes]
     lq_counts = [chr_counts[chr]['low_quality'] for chr in chromosomes]
-    incorrect_counts = [chr_counts[chr]['incorrect'] for chr in chromosomes]
     
     fig, ax = plt.subplots(figsize=(12, 6))
     bar_width = 0.35
     index = range(len(chromosomes))
     
     p1 = ax.bar(index, hq_counts, bar_width, label='High-quality', color='#1f77b4')
-    p2 = ax.bar(index, lq_counts, bar_width, bottom=hq_counts, label='Low-quality', color='#ff7f0e')
-    p3 = ax.bar(index, incorrect_counts, bar_width, bottom=[x + y for x, y in zip(hq_counts, lq_counts)], label='Incorrect', color='#2ca02c')
+    p2 = ax.bar(index, mq_counts, bar_width, bottom=hq_counts, label='Moderate-quality', color='#ff7f0e')
+    p3 = ax.bar(index, mq_counts, bar_width, bottom=[x + y for x, y in zip(hq_counts, mq_counts)], label='Low-quality', color='#2ca02c')
     
     ax.set_xlabel('Chromosomes')
     ax.set_ylabel('Number of SBCs')
@@ -49,7 +49,7 @@ def plot_pre_sam_histogram(variants, output_dir):
 
 def plot_post_sam_histogram(variants, output_dir):
     """SAM 검증 후 염색체별 SBC 분류 개수를 히스토그램으로 시각화."""
-    chr_counts = defaultdict(lambda: {'high_quality': 0, 'low_quality': 0, 'incorrect': 0, 'total': 0})
+    chr_counts = defaultdict(lambda: {'high_quality': 0, 'moderate_quality': 0, 'low_quality': 0, 'total': 0})
     for variant in variants:
         chr = variant.chrom
         quality = variant.quality_category
@@ -70,16 +70,16 @@ def plot_post_sam_histogram(variants, output_dir):
     
     chromosomes = sorted(chr_counts.keys(), key=sort_key)
     hq_counts = [chr_counts[chr]['high_quality'] for chr in chromosomes]
+    mq_counts = [chr_counts[chr]['moderate_quality'] for chr in chromosomes]
     lq_counts = [chr_counts[chr]['low_quality'] for chr in chromosomes]
-    incorrect_counts = [chr_counts[chr]['incorrect'] for chr in chromosomes]
     
     fig, ax = plt.subplots(figsize=(12, 6))
     bar_width = 0.35
     index = range(len(chromosomes))
     
     p1 = ax.bar(index, hq_counts, bar_width, label='High-quality', color='#1f77b4')
-    p2 = ax.bar(index, lq_counts, bar_width, bottom=hq_counts, label='Low-quality', color='#ff7f0e')
-    p3 = ax.bar(index, incorrect_counts, bar_width, bottom=[x + y for x, y in zip(hq_counts, lq_counts)], label='Incorrect', color='#2ca02c')
+    p2 = ax.bar(index, mq_counts, bar_width, bottom=hq_counts, label='Moderate-quality', color='#ff7f0e')
+    p3 = ax.bar(index, lq_counts, bar_width, bottom=[x + y for x, y in zip(hq_counts, mq_counts)], label='Low-quality', color='#2ca02c')
     
     ax.set_xlabel('Chromosomes')
     ax.set_ylabel('Number of SBCs')
